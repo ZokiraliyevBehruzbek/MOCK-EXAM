@@ -14,7 +14,7 @@ class ListeningTest(models.Model):
 class ReadingTest(models.Model):
     text_field = models.TextField()
     questions = models.JSONField()
-    # answers = models.JSONField()
+    answers = models.JSONField()
 
     def __str__(self):
         return f"Reading Test {self.id}"
