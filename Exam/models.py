@@ -14,15 +14,16 @@ class ListeningTest(models.Model):
 class ReadingTest(models.Model):
     text_field = models.TextField()
     questions = models.JSONField()
-    # answers = models.JSONField()
+    answers = models.JSONField()
 
     def __str__(self):
         return f"Reading Test {self.id}"
 
 
 class WritingTest(models.Model):
-    question = models.TextField()
-    answer_text = models.TextField(blank=True, null=True)
+    question1 = models.TextField()
+    question2 = models.TextField()
+
 
     def __str__(self):
         return f"Writing Test {self.id}"
@@ -31,7 +32,10 @@ class WritingTest(models.Model):
 class Exam(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Avval ForeignKey edi -> endi ManyToManyField
+    users = models.ManyToManyField(User, related_name="exams")
+
     is_public = models.BooleanField(default=False)
 
     listening = models.ForeignKey(ListeningTest, on_delete=models.SET_NULL, null=True, blank=True)
@@ -39,4 +43,4 @@ class Exam(models.Model):
     writing = models.ForeignKey(WritingTest, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Exam {self.id} - {self.user.username}"
+        return f"Exam {self.id}"
