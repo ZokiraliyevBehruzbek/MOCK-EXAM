@@ -33,7 +33,7 @@ class Exam(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
-   
+    # Avval ForeignKey edi -> endi ManyToManyField
     users = models.ManyToManyField(User, related_name="exams")
 
     is_public = models.BooleanField(default=False)
