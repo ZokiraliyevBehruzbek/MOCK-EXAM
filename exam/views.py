@@ -33,6 +33,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     serializer_class = ExamSerializer
 
     permission_classes = [IsAdminOrReadOnly]
+<<<<<<< HEAD
 
     def perform_create(self, serializer):
         exam = serializer.save()
@@ -62,3 +63,5 @@ class ExamViewSet(viewsets.ModelViewSet):
             {"detail": f"{user.username} finished the exam {exam.exam_name}."},
             status=status.HTTP_200_OK
         )
+=======
+>>>>>>> 9b5db8b (stop using AI)
