@@ -24,7 +24,7 @@ urlpatterns = (
     [
         path("admin/", admin.site.urls),
         path("auth/", include("users.urls")),
-        path("exam/", include("Exam.urls")),
+        path("exam/", include("exam.urls")),
         path(
             "swagger(<format>\.json|\.yaml)",
             schema_view.without_ui(cache_timeout=0),
