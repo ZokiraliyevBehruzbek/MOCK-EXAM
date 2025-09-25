@@ -1,0 +1,43 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations cache (agar commit qilishni xohlamasang)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE/Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Media & static (agar productionda S3 yoki boshqa storage ishlatsang)
+media/
+staticfiles/
+
+# SQLite database (agar local bo'lsa)
+db.sqlite3
+
+# Pytest / Coverage
+.coverage
+*.cover
+htmlcov/
+
+# Python build
+build/
+dist/
+*.egg-info/
