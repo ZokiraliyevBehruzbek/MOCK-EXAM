@@ -4,31 +4,33 @@ from .serializers import (
     ListeningTestSerializer, ReadingTestSerializer,
     WritingTestSerializer, ExamSerializer
 )
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsUserInExam
 
 
 class ListeningTestViewSet(viewsets.ModelViewSet):
     queryset = ListeningTest.objects.all()
     serializer_class = ListeningTestSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, IsUserInExam]
 
 
 class ReadingTestViewSet(viewsets.ModelViewSet):
     queryset = ReadingTest.objects.all()
     serializer_class = ReadingTestSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, IsUserInExam]
+
 
 
 class WritingTestViewSet(viewsets.ModelViewSet):
     queryset = WritingTest.objects.all()
     serializer_class = WritingTestSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, IsUserInExam]
 
 
 class ExamViewSet(viewsets.ModelViewSet):
     queryset = Exam.objects.filter(is_public=True)
     serializer_class = ExamSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, IsUserInExam]
+
 
     def perform_create(self, serializer):
         exam = serializer.save()

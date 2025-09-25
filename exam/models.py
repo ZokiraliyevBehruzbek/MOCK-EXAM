@@ -30,10 +30,9 @@ class WritingTest(models.Model):
 
 
 class Exam(models.Model):
+    exam_name = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-
-   
     users = models.ManyToManyField(User, related_name="exams")
 
     is_public = models.BooleanField(default=False)
