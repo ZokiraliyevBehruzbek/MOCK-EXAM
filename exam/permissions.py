@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from models import Exam
+from .models import Exam
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Admin foydalanuvchilar o‘zgartira oladi,
