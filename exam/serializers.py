@@ -21,10 +21,8 @@ class WritingTestSerializer(serializers.ModelSerializer):
 
 
 class ExamSerializer(serializers.ModelSerializer):
-    listening = ListeningTestSerializer(read_only=True)
-    reading = ReadingTestSerializer(read_only=True)
-    writing = WritingTestSerializer(read_only=True)
-
     class Meta:
         model = Exam
         fields = "__all__"
+        # serializer ichiga koshsa user examen boshlagandan oldin savollarni kurolaydi
+        exclude = ['listening', 'reading', 'writing', 'allowed_users', 'joined_users'] 

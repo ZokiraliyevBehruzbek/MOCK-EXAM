@@ -1,5 +1,8 @@
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
+from django.utils import timezone
 from .models import Exam
+
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Admin foydalanuvchilar o‘zgartira oladi,
@@ -26,4 +29,4 @@ class IsUserInExam(permissions.BasePermission):
         except Exam.DoesNotExist:
             return False
 
-        return request.user.is_authenticated and request.user in exam.users.all()
+        return request.user.is_authenticated and request.user in exam.joined_users.all()
