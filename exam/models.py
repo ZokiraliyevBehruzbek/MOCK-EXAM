@@ -35,6 +35,7 @@ class Exam(models.Model):
     end_time = models.DateTimeField()
     users = models.ManyToManyField(User, related_name="exams")
 
+    
     is_public = models.BooleanField(default=False)
 
     listening = models.ForeignKey(ListeningTest, on_delete=models.SET_NULL, null=True, blank=True)

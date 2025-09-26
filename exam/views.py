@@ -48,3 +48,17 @@ class ExamViewSet(viewsets.ModelViewSet):
 
         exam.users.add(user)
         return Response({"detail": "Successfully joined the exam."}, status=status.HTTP_200_OK)
+
+
+    @action(detail=True, methods=["post"], url_path="finish")
+    def finish_exam(self, request, pk=None):
+        exam = self.get_object()
+        user = request.user
+
+        if user not in exam.users.all():
+            return Response({"detail": "You are not part of this exam."}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response(
+            {"detail": f"{user.username} finished the exam {exam.exam_name}."},
+            status=status.HTTP_200_OK
+        )
