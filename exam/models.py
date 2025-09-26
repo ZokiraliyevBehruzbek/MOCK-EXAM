@@ -32,7 +32,7 @@ class Exam(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     allowed_users = models.ManyToManyField(User, related_name="allowed_exams")
-    joined_users = models.ManyToManyField(User, related_name="exams")
+    joined_users = models.ManyToManyField(User, related_name="exams", null=True, blank=True)
     
     is_public = models.BooleanField(default=False)
 
@@ -46,7 +46,7 @@ class Exam(models.Model):
 
 class UserExamSession(models.Model):
     user = models.ForeignKey(User, related_name='exam_sessions', on_delete=models.CASCADE)
-    exam = models.ForeignKey(User, related_name='sessions', on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, related_name='sessions', on_delete=models.CASCADE)
 
     listening_started_at = models.DateTimeField(null=True, blank=True)
     reading_started_at = models.DateTimeField(null=True, blank=True)

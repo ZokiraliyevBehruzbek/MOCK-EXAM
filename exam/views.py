@@ -33,7 +33,7 @@ class WritingTestViewSet(viewsets.ModelViewSet):
 
 
 class ExamViewSet(viewsets.ModelViewSet):
-    queryset = Exam.objects.filter(is_public=True)
+    queryset = Exam.objects.all()
     serializer_class = ExamSerializer
     permission_classes = [IsAdminOrReadOnly]
 
@@ -42,8 +42,8 @@ class ExamViewSet(viewsets.ModelViewSet):
         exam = self.get_object()
         user = request.user
 
-        if exam.start_time > timezone.now() or exam.end_time < timezone.now():
-            return Response({"detail": "not the right time"}, status=status.HTTP_400_BAD_REQUEST)
+        if exam.start_time < timezone.now():
+            return Response({"detail": "exam already started"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not user in exam.allowed_users.all() and not exam.is_public:
             return Response({"detail": "You are not allowed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -62,7 +62,8 @@ class ExamViewSet(viewsets.ModelViewSet):
         exam = self.get_object()
         user = request.user
 
-        if exam.started_at > timezone.now() or exam.end_time < timezone.now():
+        if exam.start_time > timezone.now() or exam.end_time < timezone.now():
+            print(exam.start_time, exam.end_time, timezone.now(), exam.start_time > timezone.now(), exam.end_time < timezone.now())
             raise PermissionDenied('not the right time')
         if not user in exam.joined_users.all():
             return Response({"detail": "You have not joined"}, status=status.HTTP_400_BAD_REQUEST)
@@ -105,8 +106,8 @@ class ExamViewSet(viewsets.ModelViewSet):
 
         try:
             session = UserExamSession.objects.get(exam=exam, user=user)
-            if session.listening_finished:
-                raise PermissionDenied("you have already finished listening")
+            if session.reading_finished:
+                raise PermissionDenied("you have already finished reading")
             if not session.listening_finished:
                 # listening tugatib, reading boshlash kerak
                 raise PermissionDenied("you haven't finsihed listening")
@@ -172,6 +173,7 @@ class ExamViewSet(viewsets.ModelViewSet):
                                       test_type='writing', 
                                       answers=answers)
             session.delete()
+            exam.allowed_users.get(id=request.user.id).delete()
             return Response({"detail": "That's it! Just wait for the results!"})
         except:
             raise PermissionDenied("did you even start listening?")
