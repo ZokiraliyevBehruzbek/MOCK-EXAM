@@ -5,7 +5,10 @@ from django.conf.urls.static import static
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 # Define JWT Bearer security scheme
 swagger_security = [{"Bearer": []}]
 
@@ -25,6 +28,8 @@ urlpatterns = (
         path("admin/", admin.site.urls),
         path("auth/", include("users.urls")),
         path("exam/", include("exam.urls")),
+        path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+        path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
         path(
             "swagger(<format>\.json|\.yaml)",
             schema_view.without_ui(cache_timeout=0),
