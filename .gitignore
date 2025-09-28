@@ -4,8 +4,9 @@ __pycache__/
 *$py.class
 
 # Django migrations cache (agar commit qilishni xohlamasang)
-*/migrations/*.py
-!*/migrations/__init__.py
+# Mashuni uchirdim shunchu cache emas fayllarni ham tekkan
+# */migrations/*.py
+# !*/migrations/__init__.py
 
 # Virtual environment
 venv/

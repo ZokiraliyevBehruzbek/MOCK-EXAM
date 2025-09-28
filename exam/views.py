@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAdminUser
 from datetime import timedelta
 from .models import ListeningTest, ReadingTest, WritingTest, Exam, UserExamSession, TestResult
 from django.utils import timezone
+from django.db.models import Q
 from .serializers import (
     ListeningTestSerializer, ReadingTestSerializer,
     WritingTestSerializer, ExamSerializer
@@ -182,6 +183,9 @@ class ExamViewSet(viewsets.ModelViewSet):
     queryset = Exam.objects.all()
     serializer_class = ExamSerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(Q(allowed_users__pk=self.request.user.id) | Q(is_public=True)).exclude(joined_users__pk=self.request.user.id)
 
     @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
     def join_exam(self, request, pk=None):
