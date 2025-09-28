@@ -187,6 +187,10 @@ class ExamViewSet(viewsets.ModelViewSet):
     def filter_queryset(self, queryset):
         return queryset.filter(Q(allowed_users__pk=self.request.user.id) | Q(is_public=True)).exclude(joined_users__pk=self.request.user.id)
 
+    @action(detail=False, methods=['get'], url_path='joined-exams', permission_classes=[IsAuthenticated])
+    def show_exams_user_joined(self, request, *args, **kwargs):
+        return Response(self.get_queryset().filter(joined_users__pk=request.user.pk))
+
     @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
     def join_exam(self, request, pk=None):
         exam = self.get_object()
