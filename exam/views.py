@@ -208,7 +208,7 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='leave', permission_classes=[IsAuthenticated, IsUserInExam])
     def leave_exam(self, request, pk=None):
-        exam = self.get_object()
+        exam = self.get_queryset().get(pk=pk)
         exam.joined_users.remove(request.user)
         return Response({"detail": "You left the exam."})
 
