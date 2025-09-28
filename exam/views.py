@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAdminUser
 from datetime import timedelta
 from .models import ListeningTest, ReadingTest, WritingTest, Exam, UserExamSession, TestResult
 from django.utils import timezone
+from django.db.models import Q
 from .serializers import (
     ListeningTestSerializer, ReadingTestSerializer,
     WritingTestSerializer, ExamSerializer
@@ -183,6 +184,14 @@ class ExamViewSet(viewsets.ModelViewSet):
     serializer_class = ExamSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    def filter_queryset(self, queryset):
+        return queryset.filter(Q(allowed_users__pk=self.request.user.id) | Q(is_public=True)).exclude(joined_users__pk=self.request.user.id)
+
+    @action(detail=False, methods=['get'], url_path='joined-exams', permission_classes=[IsAuthenticated])
+    def show_exams_user_joined(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset().filter(joined_users__pk=request.user.pk), many=True)
+        return Response(serializer.data)
+
     @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
     def join_exam(self, request, pk=None):
         exam = self.get_object()
@@ -199,7 +208,7 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='leave', permission_classes=[IsAuthenticated, IsUserInExam])
     def leave_exam(self, request, pk=None):
-        exam = self.get_object()
+        exam = self.get_queryset().get(pk=pk)
         exam.joined_users.remove(request.user)
         return Response({"detail": "You left the exam."})
 
