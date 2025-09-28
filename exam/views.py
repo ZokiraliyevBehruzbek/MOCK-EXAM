@@ -189,7 +189,8 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='joined-exams', permission_classes=[IsAuthenticated])
     def show_exams_user_joined(self, request, *args, **kwargs):
-        return Response(self.get_queryset().filter(joined_users__pk=request.user.pk))
+        serializer = self.get_serializer(self.get_queryset().filter(joined_users__pk=request.user.pk), many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
     def join_exam(self, request, pk=None):
