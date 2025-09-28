@@ -193,7 +193,7 @@ class ExamViewSet(viewsets.ModelViewSet):
 
         if not exam.is_public and user not in exam.allowed_users.all():
             return Response({"detail": "You are not allowed"}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         exam.joined_users.add(user)
         return Response({"detail": "Successfully joined the exam."}, status=status.HTTP_200_OK)
 
@@ -311,3 +311,11 @@ class ExamViewSet(viewsets.ModelViewSet):
             return Response({"detail": "That's it! Just wait for the results!"})
         except UserExamSession.DoesNotExist:
             raise PermissionDenied("did you even start writing?")
+        
+    # @action(detail=True, methods=['get'], url_path='exams', permission_classes=[IsAuthenticated])
+    # def public_exam_list(self, request, pk=None):
+    #     exam = self.get_object()
+
+    #     # Agar imtihon boshlangan bo'lsa, foydalanuvchi kirolmaydi
+
+    #     return Response({"detail": "Successfully joined the exam."}, status=status.HTTP_200_OK)
