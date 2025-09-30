@@ -19,14 +19,13 @@ class IsUserInExam(permissions.BasePermission):
     Faqat exam.users ichida bo‘lgan userlargagina ruxsat beradi
     """
 
-    def has_permission(self, request, view):
-        exam_id = view.kwargs.get("pk")  # yoki urldagi exam id
-        if not exam_id:
-            return False
-        
-        try:
-            exam = Exam.objects.get(pk=exam_id)
-        except Exam.DoesNotExist:
-            return False
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and request.user in obj.joined_users.all()
+    
+class IsExamNotOver(permissions.BasePermission):
+    """
+    exam.end_time va exam.start_time ga karab tekshiradi
+    """
 
-        return request.user.is_authenticated and request.user in exam.joined_users.all()
+    def has_object_permission(self, request, view, obj):
+        return obj.start_time < timezone.now() and obj.end_time > timezone.now()
