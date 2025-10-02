@@ -186,6 +186,8 @@ class ExamViewSet(viewsets.ModelViewSet):
 
             TestResult.objects.create(user=user, exam=exam, test_type='writing', answers=answers)
             exam.joined_users.remove(user)
+            session.writing_finished = True
+            session.save()
             return Response({"detail": "That's it! Just wait for the results!"})
         except UserExamSession.DoesNotExist:
             raise PermissionDenied("did you even start writing?")
