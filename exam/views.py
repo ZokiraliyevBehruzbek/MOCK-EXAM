@@ -185,7 +185,6 @@ class ExamViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied("Too late. Womp Womp")
 
             TestResult.objects.create(user=user, exam=exam, test_type='writing', answers=answers)
-            session.delete()
             exam.joined_users.remove(user)
             return Response({"detail": "That's it! Just wait for the results!"})
         except UserExamSession.DoesNotExist:
