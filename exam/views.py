@@ -104,7 +104,7 @@ class ExamViewSet(viewsets.ModelViewSet):
         try:
             session = UserExamSession.objects.get(exam=exam, user=user)
             if timezone.now() - session.listening_started_at > timedelta(minutes=32):
-                raise PermissionDenied("Too late. Womp Womp")
+                raise PermissionDenied("too_late")
 
             TestResult.objects.create(user=user, exam=exam, test_type='listening', answers=answers)
             session.listening_finished = True
@@ -145,7 +145,7 @@ class ExamViewSet(viewsets.ModelViewSet):
             if session.reading_finished:
                 raise PermissionDenied("reading already finished")
             if timezone.now() - session.reading_started_at > timedelta(minutes=60):
-                raise PermissionDenied("Too late. Womp Womp")
+                raise PermissionDenied("too_late")
 
             TestResult.objects.create(user=user, exam=exam, test_type='reading', answers=answers)
             session.reading_finished = True
@@ -182,7 +182,7 @@ class ExamViewSet(viewsets.ModelViewSet):
         try:
             session = UserExamSession.objects.get(exam=exam, user=user)
             if timezone.now() - session.writing_started_at > timedelta(minutes=60):
-                raise PermissionDenied("Too late. Womp Womp")
+                raise PermissionDenied("too_late")
 
             TestResult.objects.create(user=user, exam=exam, test_type='writing', answers=answers)
             exam.joined_users.remove(user)
