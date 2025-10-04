@@ -3,6 +3,7 @@ from users.models import User
 
 
 class ListeningTest(models.Model):
+    auto_failed = models.BooleanField(default=False)
     md_file = models.TextField()
     audio = models.FileField(upload_to="listening/")
     answers = models.JSONField()
@@ -12,6 +13,7 @@ class ListeningTest(models.Model):
 
 
 class ReadingTest(models.Model):
+    auto_failed = models.BooleanField(default=False)
     md_file = models.TextField()
     answers = models.JSONField()
 
@@ -20,6 +22,7 @@ class ReadingTest(models.Model):
 
 
 class WritingTest(models.Model):
+    auto_failed = models.BooleanField(default=False)
     question1 = models.TextField()
     question2 = models.TextField()
 

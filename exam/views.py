@@ -103,10 +103,14 @@ class ExamViewSet(viewsets.ModelViewSet):
 
         try:
             session = UserExamSession.objects.get(exam=exam, user=user)
-            if timezone.now() - session.listening_started_at > timedelta(minutes=32):
-                raise PermissionDenied("too_late")
+            if session.listening_finished:
+                raise PermissionDenied("listening already finished")
 
-            TestResult.objects.create(user=user, exam=exam, test_type='listening', answers=answers)
+            data = { "user": user, "exam": exam, "test_type": 'listening', "answers": answers }
+            if timezone.now() - session.listening_started_at > timedelta(minutes=32):
+                data['auto_failed'] = True
+
+            TestResult.objects.create(**data)
             session.listening_finished = True
             session.save()
             return Response({"detail": "Congratulations! Go on now to reading!"})
@@ -144,10 +148,12 @@ class ExamViewSet(viewsets.ModelViewSet):
             session = UserExamSession.objects.get(exam=exam, user=user)
             if session.reading_finished:
                 raise PermissionDenied("reading already finished")
-            if timezone.now() - session.reading_started_at > timedelta(minutes=60):
-                raise PermissionDenied("too_late")
 
-            TestResult.objects.create(user=user, exam=exam, test_type='reading', answers=answers)
+            data = { "user": user, "exam": exam, "test_type": 'reading', "answers": answers }
+            if timezone.now() - session.reading_started_at > timedelta(minutes=60):
+                data['auto_failed'] = True
+
+            TestResult.objects.create(**data)
             session.reading_finished = True
             session.save()
             return Response({"detail": "Congratulations! Go on now to writing!"})
@@ -181,10 +187,14 @@ class ExamViewSet(viewsets.ModelViewSet):
 
         try:
             session = UserExamSession.objects.get(exam=exam, user=user)
-            if timezone.now() - session.writing_started_at > timedelta(minutes=60):
-                raise PermissionDenied("too_late")
+            if session.writing_finished:
+                raise PermissionDenied("writing already finished")
 
-            TestResult.objects.create(user=user, exam=exam, test_type='writing', answers=answers)
+            data = { "user": user, "exam": exam, "test_type": 'writing', "answers": answers }
+            if timezone.now() - session.writing_started_at > timedelta(minutes=60):
+                data['auto_failed'] = True
+
+            TestResult.objects.create(**data)
             exam.joined_users.remove(user)
             session.writing_finished = True
             session.save()
