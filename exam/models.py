@@ -32,8 +32,9 @@ class Exam(models.Model):
     exam_name = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    allowed_users = models.ManyToManyField(User, related_name="allowed_exams")
+    allowed_users = models.ManyToManyField(User, related_name="allowed_exams", blank=True)
     joined_users = models.ManyToManyField(User, related_name="exams", blank=True)
+    finished_users = models.ManyToManyField(User, related_name="finished_exams", blank=True)
     
     is_public = models.BooleanField(default=False)
 

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
+from rest_framework.views import APIView
 from datetime import timedelta
 from .models import ListeningTest, ReadingTest, WritingTest, Exam, UserExamSession, TestResult
 from django.utils import timezone
@@ -38,10 +39,11 @@ class ExamViewSet(viewsets.ModelViewSet):
     serializer_class = ExamSerializer
     permission_classes = [IsAdminOrReadOnly]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, *args, **kwargs):
         queryset = self.queryset
-        queryset = queryset.filter(Q(allowed_users__pk=self.request.user.id) | Q(is_public=True))
-        queryset = queryset.exclude(joined_users__pk=self.request.user.id)
+        queryset = queryset.filter(Q(allowed_users__pk=self.request.user.pk) | Q(is_public=True))
+        queryset = queryset.exclude(joined_users__pk=self.request.user.pk)
+        queryset = queryset.exclude(finished_users__pk=self.request.user.pk)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -58,7 +60,16 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='joined-exams', permission_classes=[IsAuthenticated])
     def show_exams_user_joined(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset().filter(joined_users__pk=request.user.pk), many=True)
+        queryset = self.get_queryset()
+        queryset = queryset.filter(joined_users__pk=request.user.pk)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='finished-exams', permission_classes=[IsAuthenticated])
+    def show_exams_user_finished(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(finished_users__pk=request.user.pk)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
@@ -196,8 +207,53 @@ class ExamViewSet(viewsets.ModelViewSet):
 
             TestResult.objects.create(**data)
             exam.joined_users.remove(user)
+            exam.finished_users.add(user)
             session.writing_finished = True
             session.save()
             return Response({"detail": "That's it! Just wait for the results!"})
         except UserExamSession.DoesNotExist:
             raise PermissionDenied("did you even start writing?")
+
+class ReviewMyExamApiView(APIView):
+
+    def round_band_score(self, score):
+        if score % 1 > 0.5:
+            return score - (score%1) + 1
+        elif score % 1 < 0.5 and score % 1 > 0:
+            return score - (score%1) + 0.5
+        return score
+
+    def review_answers(self, user_answers, correct_answers):
+        total = 0
+        for question, answers in correct_answers.items():
+            try:
+                if user_answers[question].lower() in answers: total += 1
+            except: pass
+        score = 9 * (total / 40)
+        score = self.round_band_score(score)
+        return score
+
+    def get(self, request, *args, **kwargs):
+        exam = Exam.objects.get(pk=kwargs.get('pk'))
+        user = request.user
+        results = TestResult.objects.filter(exam=exam, user=user)
+        band_scores = []
+        overall = 0
+
+        for result in results:
+            obj = { 'type': result.test_type }
+            if result.test_type == 'writing':
+                obj['score'] = 7.0
+            elif result.test_type == 'listening':
+                obj['score'] = self.review_answers(result.answers, exam.listening.answers)
+            elif result.test_type == 'reading':
+                obj['score'] = self.review_answers(result.answers, exam.reading.answers)
+            overall += obj['score']
+            band_scores.append(obj)
+
+        band_scores.append({ 
+            'type': 'overall',
+            'score': self.round_band_score(overall/4)
+        })            
+
+        return Response(band_scores)
