@@ -21,7 +21,7 @@ class ReadingTest(models.Model):
 
 class WritingTest(models.Model):
     question1 = models.TextField()
-    graph = models.FileField()
+    graph = models.FileField(null=True, blank=True)
     question2 = models.TextField()
 
     def __str__(self):
