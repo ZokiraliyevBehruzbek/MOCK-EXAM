@@ -253,7 +253,7 @@ class ReviewMyExamApiView(APIView):
 
         band_scores.append({ 
             'type': 'overall',
-            'score': self.round_band_score(overall/4)
+            'score': self.round_band_score(overall/len(band_scores))
         })            
 
         return Response(band_scores)
