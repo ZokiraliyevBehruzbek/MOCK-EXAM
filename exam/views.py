@@ -77,8 +77,8 @@ class ExamViewSet(viewsets.ModelViewSet):
         exam = self.get_object()
         user = request.user
 
-        if exam.start_time < timezone.now():
-            return Response({"detail": "exam already started"}, status=status.HTTP_400_BAD_REQUEST)
+        if exam.end_time < timezone.now():
+            return Response({"detail": "exam already ended"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not exam.is_public and user not in exam.allowed_users.all():
             return Response({"detail": "You are not allowed"}, status=status.HTTP_400_BAD_REQUEST)
